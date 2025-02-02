@@ -10,7 +10,6 @@ import wandb
 from trl import SFTTrainer
 from transformers import TrainingArguments, AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling
 from peft import LoraConfig, get_peft_model
-import pandas as pd
 from datasets import Dataset
 from dotenv import load_dotenv
 
@@ -84,7 +83,7 @@ def prepare_datasets(data):
         format_function_calling_data, batched=True, remove_columns=splits["test"].column_names
     )
 
-    print(f"\nDataset sizes:")
+    print("\nDataset sizes:")
     print(f"Training examples: {len(train_dataset)}")
     print(f"Evaluation examples: {len(eval_dataset)}")
 
@@ -177,7 +176,7 @@ if __name__ == "__main__":
     tokenizer.save_pretrained(new_model_name)
 
     # Push to Hub if desired
-    if os.environ.get("PUSH_TO_HUB", "false").lower() == "true":
+    if os.environ.get("PUSH_TO_HUB", "true").lower() == "true":
         model.push_to_hub(f"pkalkman/{new_model_name}")
         tokenizer.push_to_hub(f"pkalkman/{new_model_name}")
 
