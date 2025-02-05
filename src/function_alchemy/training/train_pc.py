@@ -1,5 +1,5 @@
 """
-Main training script optimized for RTX3090 GPU with Unsloth for faster and memory-efficient fine-tuning.
+Main training script optimized for RTX3090 GPU.
 """
 
 import os
@@ -8,12 +8,11 @@ import json
 from huggingface_hub import login
 import wandb
 from trl import SFTTrainer
-from transformers import TrainingArguments, DataCollatorForLanguageModeling
-from peft import LoraConfig
+from transformers import TrainingArguments, AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling
+from peft import LoraConfig, get_peft_model
 from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
-from unsloth import FastLanguageModel
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
@@ -34,15 +33,17 @@ def setup_wandb():
     return wandb.init(project="phi-2-2.7B-func", job_type="training", anonymous="allow")
 
 
-def load_model_and_tokenizer(model_name="microsoft/phi-2"):
-    """Load Phi-2 using Unsloth's optimized training framework."""
-    model, tokenizer = FastLanguageModel.from_pretrained(
+def load_model_and_tokenizer(model_name):
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
+
+    model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        max_seq_length=4096,
-        dtype=torch.float16,
-        load_in_4bit=True,
+        torch_dtype=torch.bfloat16,  # Changed back to bfloat16 for RTX3090
+        device_map="auto",
+        use_cache=False,
     )
-    tokenizer.pad_token = tokenizer.eos_token  # Ensure padding is handled correctly
     return model, tokenizer
 
 
@@ -83,21 +84,21 @@ def prepare_datasets(data, tokenizer):
 
 def get_training_args():
     return TrainingArguments(
-        run_name="phi-2-optimized",
-        per_device_train_batch_size=4,
-        per_device_eval_batch_size=4,
-        gradient_accumulation_steps=8,
-        max_steps=500,
-        learning_rate=2e-4,
-        lr_scheduler_type="cosine",
-        warmup_ratio=0.1,
-        fp16=True,
+        run_name="phi-2-func",
+        per_device_train_batch_size=2,  # Increased for RTX3090
+        per_device_eval_batch_size=2,  # Increased for RTX3090
+        gradient_accumulation_steps=16,  # Adjusted for larger batch size
+        max_steps=500,  # Increased training duration
+        learning_rate=5e-5,  # Optimized learning rate
+        lr_scheduler_type="cosine",  # Added LR scheduler
+        warmup_ratio=0.1,  # Added warmup
+        fp16=True,  # Enable mixed precision
         logging_steps=25,
-        evaluation_strategy="steps",
-        eval_steps=50,
+        evaluation_strategy="steps",  # Added evaluation
+        eval_steps=25,
         save_strategy="steps",
-        save_steps=100,
-        save_total_limit=3,
+        save_steps=25,
+        save_total_limit=3,  # Keep more checkpoints
         output_dir="outputs",
         push_to_hub=False,
         report_to=["wandb"] if os.environ.get("WANDB_API_KEY") else [],
@@ -106,7 +107,8 @@ def get_training_args():
 
 def prepare_model_for_training(model):
     model.config.use_cache = False
-    model.gradient_checkpointing_enable()  # Reduce VRAM usage
+    if hasattr(model, "enable_input_require_grads"):
+        model.enable_input_require_grads()
     return model
 
 
@@ -119,14 +121,23 @@ if __name__ == "__main__":
     train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
 
     lora_config = LoraConfig(
-        r=8,  # Reduce LoRA rank for efficiency
-        lora_alpha=16,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
-        lora_dropout=0.05,
+        r=16,  # Increased rank
+        lora_alpha=32,
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+        lora_dropout=0.05,  # Reduced dropout
         bias="none",
         task_type="CAUSAL_LM",
     )
 
+    model = get_peft_model(model, lora_config)
     run = setup_wandb()
 
     trainer = SFTTrainer(
