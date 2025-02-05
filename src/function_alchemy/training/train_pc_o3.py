@@ -149,7 +149,7 @@ if __name__ == "__main__":
     )
 
     # Initialize unsloth (using hypothetical parameters; adjust as necessary)
-    unsloth.initialize(precision="fp16", device="cuda")
+    # unsloth.initialize(precision="fp16", device="cuda")
 
     # Run training inside unsloth’s context for improved performance
     with unsloth.training_context():
