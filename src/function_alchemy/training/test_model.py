@@ -69,20 +69,35 @@ def format_prompt(instruction: str, available_functions: List[Dict[str, Any]]) -
 
 
 def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
-    """Generate a response from the model."""
+    """Generate a response from the model with streaming output."""
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-
-    outputs = model.generate(
+    
+    # Store the generated text
+    generated_text = ""
+    print("\nGenerating response:")
+    print("-" * 40)
+    
+    # Stream the output token by token
+    for output in model.generate(
         **inputs,
         max_new_tokens=max_new_tokens,
         temperature=0.1,
         do_sample=True,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-    )
-
-    response = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    return response.replace(prompt, "").strip()
+        streamer=None,  # We'll handle streaming manually
+        return_dict_in_generate=True,
+        output_scores=True,
+    ).sequences:
+        current_text = tokenizer.decode(output, skip_special_tokens=True)
+        new_text = current_text[len(generated_text):]
+        print(new_text, end="", flush=True)
+        generated_text = current_text
+    
+    print("\n" + "-" * 40)
+    
+    # Return only the generated response without the prompt
+    return generated_text.replace(prompt, "").strip()
 
 
 def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
