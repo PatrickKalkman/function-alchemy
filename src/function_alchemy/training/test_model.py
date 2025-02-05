@@ -154,19 +154,27 @@ def run_test_cases():
         function_call = parse_function_call(response)
         print(f"Parsed function call:\n{json.dumps(function_call, indent=2) if function_call else None}")
 
-        # Get the actual function name
+        # Get the actual function name from the parsed response
         actual_name = None
-        if function_call:
-            if "name" in function_call:
-                actual_name = function_call["name"]
+        if function_call and "function_call" in function_call:
+            actual_name = function_call["function_call"].get("name")
+        elif function_call and "name" in function_call:
+            actual_name = function_call["name"]
 
-        results.append(
-            {
-                "instruction": test_case["instruction"],
-                "expected_function": test_case["expected_function"],
-                "actual_function": actual_name,
-            }
-        )
+        # Validate function name
+        success = actual_name == test_case["expected_function"]
+        
+        results.append({
+            "instruction": test_case["instruction"],
+            "expected_function": test_case["expected_function"],
+            "actual_function": actual_name,
+            "success": success,
+            "error": None if success else f"Expected {test_case['expected_function']}, got {actual_name}"
+        })
+
+        # Print individual test result
+        status = "✓" if success else "✗"
+        print(f"{status} Function name match: {success}")
 
     # Print summary
     print("\nTest Summary:")
