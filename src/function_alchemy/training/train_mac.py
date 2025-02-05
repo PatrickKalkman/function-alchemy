@@ -82,11 +82,11 @@ def get_training_args():
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=16,
         max_steps=500,
-        learning_rate=1e-5,  # Lower learning rate
+        learning_rate=5e-5,  # Lower learning rate
         weight_decay=0.1,  # Increase weight decay
         max_grad_norm=5.0,  # Increase gradient clipping
         lr_scheduler_type="cosine",
-        warmup_ratio=0.2,  # Longer warmup
+        warmup_ratio=0.15,  # Longer warmup
         fp16=False,
         logging_steps=10,
         evaluation_strategy="steps",
