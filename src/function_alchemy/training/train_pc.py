@@ -13,6 +13,7 @@ from peft import LoraConfig, get_peft_model
 from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
+from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
 
