@@ -34,27 +34,27 @@ Instruction: {instruction}"""
 def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
     """Load the fine-tuned model and tokenizer, first trying locally then from HuggingFace Hub."""
     try:
-        # Try loading base model locally first
+        # Try loading base model from HuggingFace Hub first
+        print(f"Loading base model from HuggingFace Hub: {base_model_name}")
+        model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+        tokenizer.pad_token = tokenizer.eos_token
+    except Exception as e:
+        print(f"HuggingFace Hub load failed: {e}")
         print(f"Attempting to load base model locally from {base_model_name}")
         model = AutoModelForCausalLM.from_pretrained(
             base_model_name, torch_dtype=torch.bfloat16, device_map="auto", local_files_only=True
         )
         tokenizer = AutoTokenizer.from_pretrained(base_model_name, local_files_only=True)
-        tokenizer.pad_token = tokenizer.eos_token
-    except Exception as e:
-        print(f"Local load failed: {e}")
-        print(f"Loading base model from HuggingFace Hub: {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
     try:
-        # Try loading PEFT adapter locally
-        print(f"Attempting to load PEFT adapter locally from {model_repo}")
-        model = PeftModel.from_pretrained(model, model_repo, device_map="auto", local_files_only=True)
-    except Exception as e:
-        print(f"Local PEFT load failed: {e}")
+        # Try loading PEFT adapter from HuggingFace Hub
         print(f"Loading PEFT adapter from HuggingFace Hub: {model_repo}")
         model = PeftModel.from_pretrained(model, model_repo, device_map="auto")
+    except Exception as e:
+        print(f"HuggingFace Hub PEFT load failed: {e}")
+        print(f"Attempting to load PEFT adapter locally from {model_repo}")
+        model = PeftModel.from_pretrained(model, model_repo, device_map="auto", local_files_only=True)
 
     model.eval()
     return model, tokenizer
