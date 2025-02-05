@@ -83,13 +83,6 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
     return response.replace(prompt, "").strip()
 
 
-import torch
-import json
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-from typing import List, Dict, Any, Optional, Union
-
-
 def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
     """Extract and parse the function call from the model's response."""
     try:
