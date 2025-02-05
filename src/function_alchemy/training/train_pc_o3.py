@@ -152,8 +152,8 @@ if __name__ == "__main__":
     # unsloth.initialize(precision="fp16", device="cuda")
 
     # Run training inside unsloth’s context for improved performance
-    with unsloth.training_context():
-        trainer.train()
+    # with unsloth.training_context():
+    trainer.train()
 
     new_model_name = "phi-2-2.7B-func"
     model.save_pretrained(new_model_name)
