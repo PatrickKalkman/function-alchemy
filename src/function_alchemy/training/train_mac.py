@@ -47,9 +47,13 @@ def load_model_and_tokenizer(model_name):
     # Add device map for Mac M3
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.float16,  # Changed from bfloat16 to float16 for M3
-        device_map="auto",  # Enable automatic device mapping
-        use_cache=False,  # Reduce memory usage during training
+        torch_dtype=torch.float16,
+        device_map="auto",
+        use_cache=False,
+        max_length=512,  # Added max length
+        do_sample=True,  # Enable sampling
+        temperature=0.7,  # Control randomness
+        top_p=0.9,  # Nucleus sampling
     )
     return model, tokenizer
 
@@ -100,19 +104,24 @@ def prepare_datasets(data, tokenizer):
 def get_training_args():
     return TrainingArguments(
         run_name="phi-2-func",
-        per_device_train_batch_size=1,  # Reduced for M3
-        per_device_eval_batch_size=1,  # Reduced for M3
-        gradient_accumulation_steps=16,  # Increased to compensate
-        max_steps=100,  # Reduced for testing
-        learning_rate=1e-4,
-        fp16=False,  # Enable mixed precision
+        per_device_train_batch_size=1,
+        per_device_eval_batch_size=1,
+        gradient_accumulation_steps=16,
+        max_steps=100,
+        learning_rate=5e-5,  # Reduced learning rate
+        weight_decay=0.05,  # Added weight decay
+        lr_scheduler_type="cosine",
+        warmup_ratio=0.1,
+        fp16=False,
         logging_steps=10,
+        evaluation_strategy="steps",
+        eval_steps=10,
+        save_strategy="steps",
         save_steps=50,
-        eval_steps=50,
         output_dir="outputs",
-        save_total_limit=2,  # Limit saved checkpoints
-        push_to_hub=False,  # Disable during testing
-        report_to=["wandb"] if os.environ.get("WANDB_API_KEY") else [],
+        save_total_limit=2,
+        push_to_hub=False,
+        report_to=["wandb"],
     )
 
 
@@ -139,8 +148,8 @@ if __name__ == "__main__":
 
     # Setup LoRA configuration
     lora_config = LoraConfig(
-        r=8,  # Reduced rank
-        lora_alpha=32,
+        r=8,
+        lora_alpha=16,  # Reduced alpha
         target_modules=[
             "q_proj",
             "k_proj",
@@ -150,7 +159,7 @@ if __name__ == "__main__":
             "up_proj",
             "down_proj",
         ],
-        lora_dropout=0.1,
+        lora_dropout=0.05,  # Reduced dropout
         bias="none",
         task_type="CAUSAL_LM",
     )

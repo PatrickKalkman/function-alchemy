@@ -23,7 +23,7 @@ K8S_FUNCTIONS = [
     },
 ]
 
-PROMPT_TEMPLATE = """You are an AI that ONLY returns the selected function call in JSON format. No explanations, no reasoning, only JSON.
+PROMPT_TEMPLATE = """You are an AI that ONLY returns the selected single function call in JSON format. No explanations, no reasoning, only JSON.
 
 Available Functions:
 {functions}
