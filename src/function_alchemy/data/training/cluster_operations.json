@@ -1,0 +1,68 @@
+{
+    "functions": [
+        {
+            "name": "get_last_events",
+            "description": "Retrieve the message of the last four events in the cluster.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        },
+        {
+            "name": "switch_cluster",
+            "description": "Switch to a different Kubernetes cluster using its name.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "cluster_name": {
+                        "type": "string",
+                        "description": "The name of the cluster to switch to"
+                    }
+                },
+                "required": [
+                    "cluster_name"
+                ]
+            }
+        },
+        {
+            "name": "get_cluster_status",
+            "description": "Returns detailed status information about the Kubernetes cluster including node metrics, pod status, resource usage, and recent issues.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        },
+        {
+            "name": "get_version_info",
+            "description": "Returns version information for both Kubernetes API server and nodes.",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+                "required": []
+            }
+        },
+        {
+            "name": "analyze_deployment_logs",
+            "description": "Analyzes logs from all pods in a deployment for criticals/errors/warnings in the last hour.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "deployment_name": {
+                        "type": "string",
+                        "description": "The name of the deployment to analyze"
+                    },
+                    "namespace": {
+                        "type": "string",
+                        "description": "The namespace of the deployment",
+                        "default": "default"
+                    }
+                },
+                "required": [
+                    "deployment_name"
+                ]
+            }
+        }
+    ]
+}

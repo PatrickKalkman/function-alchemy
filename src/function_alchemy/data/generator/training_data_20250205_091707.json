@@ -1,0 +1,344 @@
+{
+  "training_examples": [
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Switch over to the production cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "production"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you change my current context to the staging cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "staging"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to switch to DR cluster immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "DR"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl config use-context dev-cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "dev-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to perform maintenance on test-cluster, please switch to it"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "test-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How do I switch to the qa cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "qa"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Set active cluster to sandbox please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "sandbox"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to Kubernetes - can you help me switch to the training cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "training"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Point my kubectl context to europe-west"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "europe-west"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Change cluster context to us-east-prod"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "us-east-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Switch over to the production cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "production"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to urgently change to the staging environment cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "staging"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, could you help me connect to the dev cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "dev"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl context needs to be changed to qa-cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "qa-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Set active cluster to europe-west-prod"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "europe-west-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "We're having an incident - switch to the dr-backup cluster immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "dr-backup"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you point my kubectl to the test environment?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "test"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Change kubernetes context to sandbox-cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "sandbox-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to work on us-west-2-prod cluster, can you switch to it?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "us-west-2-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please switch the kubernetes context to integration-test cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "integration-test"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

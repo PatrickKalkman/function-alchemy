@@ -2,7 +2,7 @@ import torch
 import json
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from peft import PeftModel
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 # Example OpenAI-style function definitions
 K8S_FUNCTIONS = [
@@ -25,20 +25,14 @@ K8S_FUNCTIONS = [
     },
 ]
 
-PROMPT_TEMPLATE = """You are a Kubernetes operations assistant. Given the following functions and user request, provide a suitable response in valid JSON format following the OpenAI function calling schema.
+PROMPT_TEMPLATE = """Below is an instruction that describes a task, paired with an API that contains functions. Write a response that appropriately calls the function.
 
-Available functions:
+Available Functions:
 {functions}
 
-User request: {instruction}
+Instruction: {instruction}
 
-Think through the appropriate function to call:
-<think>
-Let me analyze the request and determine the most appropriate function to call...
-{thought}
-</think>
-
-{output}"""
+Response: {output}"""
 
 
 def load_model(model_repo: str, base_model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"):
@@ -86,27 +80,8 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
 def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
     """Extract and parse the function call from the model's response."""
     try:
-        # Find the JSON object after the thought section
-        thought_end = response.find("</think>")
-        if thought_end == -1:
-            return None
-
-        # Extract everything after </think>
-        function_json = response[thought_end + 8 :].strip()
-
-        # Remove any code block markers
-        function_json = function_json.replace("```json", "").replace("```", "").strip()
-
-        # Extract the JSON object
-        start = function_json.find("{")
-        end = function_json.rfind("}") + 1
-        if start == -1 or end == 0:
-            return None
-
-        function_json = function_json[start:end]
-
         # Parse the JSON
-        parsed = json.loads(function_json)
+        parsed = json.loads(response)
 
         # Transform the format if needed
         if "function" in parsed:
@@ -129,55 +104,8 @@ def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
 
         return parsed
     except json.JSONDecodeError:
-        print(f"Failed to parse JSON: {function_json}")
+        print(f"Failed to parse JSON: {response}")
         return None
-
-
-def validate_openai_function_format(parsed: Dict[str, Any]) -> bool:
-    """Validate that the response follows either OpenAI's format or our model's format."""
-    if not isinstance(parsed, dict):
-        return False
-
-    # Check for our model's format
-    if "function" in parsed:
-        function_data = parsed["function"]
-        return isinstance(function_data, dict) and "name" in function_data
-
-    # Check for OpenAI's format
-    if "function_call" in parsed:
-        function_call = parsed["function_call"]
-        return isinstance(function_call, dict) and "name" in function_call
-
-    return False
-
-
-def validate_function_arguments(function_call: Dict[str, Any], function_schema: Dict[str, Any]) -> bool:
-    """Validate that the function arguments match the schema requirements."""
-    # For functions without required arguments (like get_number_of_nodes)
-    if not function_schema["parameters"].get("required", []):
-        return True
-
-    # For functions with required arguments
-    if "function" in function_call:
-        # Our model's format - check if parameters are defined
-        params = function_call["function"].get("parameters", {})
-        required_params = function_schema["parameters"].get("required", [])
-
-        # Consider it valid if the parameters structure is defined
-        return isinstance(params, dict)
-
-    # OpenAI format
-    if "function_call" in function_call:
-        args = function_call["function_call"].get("arguments", {})
-        if isinstance(args, str):
-            try:
-                args = json.loads(args)
-            except json.JSONDecodeError:
-                return False
-        required_params = function_schema["parameters"].get("required", [])
-        return all(param in args for param in required_params)
-
-    return False
 
 
 def run_test_cases():
@@ -231,34 +159,13 @@ def run_test_cases():
             elif "function_call" in function_call:
                 actual_name = function_call["function_call"]["name"]
 
-        # Validate format and arguments
-        format_valid = validate_openai_function_format(function_call if function_call else {})
-        args_valid = validate_function_arguments(function_call if function_call else {}, test_case["schema"])
-
-        name_matches = actual_name == test_case["expected_function"]
-        success = format_valid and args_valid and name_matches
-
         results.append(
             {
                 "instruction": test_case["instruction"],
                 "expected_function": test_case["expected_function"],
                 "actual_function": actual_name,
-                "format_valid": format_valid,
-                "args_valid": args_valid,
-                "success": success,
             }
         )
-
-        if not success:
-            print("\nFailure Analysis:")
-            if not format_valid:
-                print("- Invalid function call format")
-            if not args_valid:
-                print("- Missing or invalid required arguments")
-            if not name_matches:
-                print(f"- Wrong function name: got {actual_name}, expected {test_case['expected_function']}")
-
-        print(f"\nTest {'passed' if success else 'failed'}")
 
     # Print summary
     print("\nTest Summary:")

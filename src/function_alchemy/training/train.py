@@ -13,9 +13,7 @@ from peft import LoraConfig, get_peft_model
 from datasets import Dataset
 from dotenv import load_dotenv
 
-# Import our custom modules
-from function_alchemy.data.k8s_functions_config import PROMPT_TEMPLATE
-from function_alchemy.data.k8s_data_generator import get_combined_training_data
+from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 load_dotenv()
 
@@ -39,15 +37,17 @@ def load_model_and_tokenizer(model_name):
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.padding_side = "right"
 
+    # Add device map for Mac M3
     model = AutoModelForCausalLM.from_pretrained(
         model_name,
-        torch_dtype=torch.bfloat16,
+        torch_dtype=torch.float16,  # Changed from bfloat16 to float16 for M3
+        device_map="auto",  # Enable automatic device mapping
+        use_cache=False,  # Reduce memory usage during training
     )
-
     return model, tokenizer
 
 
-def format_function_calling_data(examples):
+def format_function_calling_data(examples, tokenizer):
     """Format the training data according to our prompt template."""
     texts = []
     for input, cot, output, funcs in zip(
@@ -66,7 +66,7 @@ def format_function_calling_data(examples):
     return {"text": texts}
 
 
-def prepare_datasets(data):
+def prepare_datasets(data, tokenizer):
     """Prepare and split the datasets."""
     # Convert to Dataset format
     dataset = Dataset.from_list(data)
@@ -76,69 +76,64 @@ def prepare_datasets(data):
 
     # Format both splits
     train_dataset = splits["train"].map(
-        format_function_calling_data, batched=True, remove_columns=splits["train"].column_names
+        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["train"].column_names
     )
 
     eval_dataset = splits["test"].map(
-        format_function_calling_data, batched=True, remove_columns=splits["test"].column_names
+        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["test"].column_names
     )
 
     print("\nDataset sizes:")
     print(f"Training examples: {len(train_dataset)}")
     print(f"Evaluation examples: {len(eval_dataset)}")
 
-    # Print samples
-    print("\nSample training example:")
-    print(train_dataset[0]["text"][:500] + "...")
-    print("\nSample evaluation example:")
-    print(eval_dataset[0]["text"][:500] + "...")
-
     return train_dataset, eval_dataset
 
 
 def get_training_args():
-    """Get training arguments."""
     return TrainingArguments(
         run_name="DeepSeek-R1-Distill-Qwen-1.5B-func-openai",
-        per_device_train_batch_size=2,
-        per_device_eval_batch_size=2,
-        gradient_accumulation_steps=8,
-        warmup_steps=100,
-        max_steps=1000,
+        per_device_train_batch_size=1,  # Reduced for M3
+        per_device_eval_batch_size=1,  # Reduced for M3
+        gradient_accumulation_steps=16,  # Increased to compensate
+        max_steps=100,  # Reduced for testing
         learning_rate=1e-4,
-        fp16=False,
-        logging_steps=50,
-        save_steps=200,
-        eval_steps=200,
-        eval_strategy="steps",
-        optim="adamw_torch",
-        weight_decay=0.01,
-        lr_scheduler_type="cosine",
-        seed=3407,
+        fp16=False,  # Enable mixed precision
+        logging_steps=10,
+        save_steps=50,
+        eval_steps=50,
         output_dir="outputs",
-        load_best_model_at_end=True,
-        metric_for_best_model="eval_loss",
-        greater_is_better=False,
+        save_total_limit=2,  # Limit saved checkpoints
+        push_to_hub=False,  # Disable during testing
+        report_to=["wandb"] if os.environ.get("WANDB_API_KEY") else [],
     )
 
 
-if __name__ == "__main__":
-    # Initialize wandb
-    run = setup_wandb()
+def prepare_model_for_training(model):
+    """Optimize model for training on M3"""
+    model.config.use_cache = False
 
+    # Enable gradient checkpointing
+    if hasattr(model, "enable_input_require_grads"):
+        model.enable_input_require_grads()
+
+    return model
+
+
+if __name__ == "__main__":
     # Load model and tokenizer
     model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
     model, tokenizer = load_model_and_tokenizer(model_name)
+    model = prepare_model_for_training(model)
 
     # Get the training data
-    function_calling_data = get_combined_training_data()
-
-    # Prepare datasets
-    train_dataset, eval_dataset = prepare_datasets(function_calling_data)
+    function_calling_data = load_training_data()
+    train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
 
     # Setup LoRA configuration
     lora_config = LoraConfig(
-        r=16,
+        r=8,  # Reduced rank
+        lora_alpha=32,
         target_modules=[
             "q_proj",
             "k_proj",
@@ -148,14 +143,16 @@ if __name__ == "__main__":
             "up_proj",
             "down_proj",
         ],
-        lora_alpha=16,
-        lora_dropout=0,
+        lora_dropout=0.1,
         bias="none",
         task_type="CAUSAL_LM",
     )
 
     # Apply LoRA config to model
     model = get_peft_model(model, lora_config)
+
+    # Initialize wandb
+    run = setup_wandb()
 
     # Initialize trainer
     trainer = SFTTrainer(

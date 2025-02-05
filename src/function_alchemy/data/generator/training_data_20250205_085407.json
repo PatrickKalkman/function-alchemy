@@ -1,0 +1,2594 @@
+{
+  "training_examples": [
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's been happening in the cluster lately?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the most recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to see latest cluster events immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of getting recent events please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you fetch the last 4 events from the cluster for my routine check?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check the cluster's event history"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display recent cluster activity"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help! Need to see what's been happening in the cluster in the last few events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Could you retrieve the most recent cluster events for analysis?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Pull up the latest event logs from the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's been happening in the cluster lately?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the latest cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to see recent cluster activity"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of getting last events please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you pull up the most recent events from our Kubernetes cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check what events occurred in the last few minutes"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Debug request: fetch latest cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a summary of recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display the 4 most recent events in the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, what's the latest status update from our k8s events?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's been happening in the cluster lately?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the most recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to see latest cluster events immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of getting last few events please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you pull up the recent cluster activity?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check what events occurred in the last few minutes"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display the 4 most recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "For monitoring purposes, what are the latest events?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help! Need to see what's going on in the cluster right now"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a snapshot of recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's been happening in the cluster lately?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the most recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to see latest cluster events immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of getting recent events please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you pull up the last few events from the cluster for my review?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check the cluster's event history - what are the last 4 events?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Investigating an issue - need to see recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display last 4 cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, could you check what events happened in the cluster recently?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Running routine check - need to see latest cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's been happening in the cluster lately?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the most recent cluster events"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to check latest cluster activity now"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of getting last few events please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you pull up the recent events from our Kubernetes cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to review the last 4 events that occurred in the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Doing routine check - what are the latest cluster events?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help! Need to see what just happened in the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "fetch recent cluster event messages"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display the 4 most recent events from the Kubernetes cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_last_events",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Switch over to the production cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "production"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, can you change my current cluster to staging please?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "staging"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need immediate cluster switch to disaster-recovery"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "disaster-recovery"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl context needs to be dev-cluster-01"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "dev-cluster-01"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to work on the test environment, can you switch the cluster for me?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "test"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Change my Kubernetes context to qa-cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "qa-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Point me to the sandbox cluster asap"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "sandbox"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to do maintenance on europe-west, switch cluster please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "europe-west"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Set active cluster to backup-cluster-02 for disaster recovery test"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "backup-cluster-02"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I want to switch to the us-east-prod cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "us-east-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Switch over to the production cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "production"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "We need to change to the staging environment ASAP - there's an urgent issue"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "staging"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl config use-context dev-cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "dev-cluster"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, can you help me connect to the test environment?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "test"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to switch the active cluster to qa-environment"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "qa-environment"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Change my current context to europe-west-prod"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "europe-west-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Point me to the backup cluster for the emergency failover"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "backup"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Could you set my kubernetes context to development please?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "development"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to switch to us-west-2-prod cluster for maintenance"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "us-west-2-prod"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "connect me to the sandbox cluster for testing"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "switch_cluster",
+            "arguments": {
+              "cluster_name": "sandbox"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How healthy is my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you show me the current status of my Kubernetes cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Check cluster health status immediately!"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a detailed report of my cluster's performance and health metrics"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run diagnostics on the k8s cluster please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current resource utilization and pod status across my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to k8s - how can I check if everything is running correctly?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a full cluster status report with all metrics and issues"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Are there any issues with my kubernetes cluster that I should know about?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display comprehensive cluster health status and resource metrics"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How healthy is my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you show me the current cluster metrics and health status?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need immediate status check on cluster health and resources"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to K8s - can you tell me if everything is running properly?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run a comprehensive cluster health check"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current resource utilization and pod status across the cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Weekly cluster status report needed"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Check if there are any issues with the kubernetes cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please analyze cluster performance and provide detailed metrics"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a status overview of nodes, pods, and resource usage"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How healthy is my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you check the cluster status? Something seems off"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need immediate cluster health report"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me detailed metrics and status for all cluster components"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to K8s - how can I see if everything is running correctly?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run a comprehensive cluster health check"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current resource usage and pod status across the cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a status report on cluster health and performance"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "We're seeing timeouts - what's the cluster status?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify cluster health for compliance audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How healthy is my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need immediate cluster status check"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you show me the current status of all nodes and pods in the cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to K8s - can you check if everything is running correctly?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run a comprehensive cluster health assessment"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display detailed metrics and resource usage for the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Are there any issues with the cluster that I should know about?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please perform routine cluster status check"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current operational status of my Kubernetes environment?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Give me a full report on cluster health and resource utilization"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "How healthy is my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need a detailed status report of the Kubernetes cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Check cluster health status immediately"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current resource usage and pod status in my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you show me the cluster metrics and node status?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, I'm new to K8s - can you check if everything is running okay?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run a comprehensive cluster health check"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Something seems off - get me the cluster status ASAP"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Daily cluster status check please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl equivalent of checking overall cluster health?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_cluster_status",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What version of Kubernetes am I running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you tell me the version information for my Kubernetes cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need K8s version details for security audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to Kubernetes - how do I check what version I have installed?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Show me the version details for both the API server and nodes"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify cluster version compatibility - what versions are running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl version equivalent - need full version info"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display the version information for my Kubernetes environment"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Quick version check needed for troubleshooting"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What's the current version status of API server and nodes?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What version of Kubernetes am I running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you tell me the version information for my K8s cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need K8s version info for security audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to Kubernetes - how do I check what version I have installed?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display version details for API server and nodes"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify cluster version compatibility - please show version info"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "show k8s version"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What versions are my API server and nodes running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to check if we're running latest K8s version"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl version equivalent please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What version of Kubernetes am I running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check the Kubernetes version information for my cluster ASAP"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you tell me the version details of both the API server and nodes?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, I'm new to K8s - how do I find out what version I'm using?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify cluster version info for compliance audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "show me the kubernetes version information"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm troubleshooting version compatibility issues - what versions are running on my cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display version details for API server and nodes please"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to check if I'm running latest k8s version"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "get version info for my kubernetes deployment"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What version of Kubernetes am I running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you tell me the version information for my Kubernetes cluster?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need K8s version info for security audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to Kubernetes - how do I check what version I have installed?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display version details for both API server and nodes"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify Kubernetes version compatibility - what version info can you show me?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Check if my nodes and API server versions match"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "show me k8s version"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Running version diagnostics - first need cluster version info"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Preparing upgrade - what's my current k8s version?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "What version of Kubernetes am I running?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to check the version info for both the API server and nodes ASAP - it's urgent"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Hey, can you tell me which Kubernetes version we're currently using?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I'm new to K8s - how do I find out what version is installed?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need to verify API server and node versions for compliance audit"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Display current version information for the cluster"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Could you fetch the version details for both nodes and API server please?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Before I upgrade, I need to know what versions we're currently running"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "show k8s version info"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Need comprehensive version information for the entire Kubernetes setup"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "get_version_info",
+            "arguments": {}
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,184 @@
+{
+  "training_examples": [
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Check the frontend deployment for errors"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "frontend",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "URGENT: Need to analyze auth-service logs for critical errors ASAP"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "auth-service",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Can you analyze the logs from the payment-processor deployment in the finance namespace for any warnings or errors?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "payment-processor",
+              "namespace": "finance"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "kubectl get logs for api-gateway deployment"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "api-gateway",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "I need to see if there are any critical issues in the monitoring deployment's logs from the last hour"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "monitoring",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Review cache-service logs in cache-system namespace for errors"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "cache-service",
+              "namespace": "cache-system"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Help! The backend deployment is acting weird - can you check its logs for any errors?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "backend",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Please analyze the logging patterns of the message-queue deployment in messaging namespace"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "message-queue",
+              "namespace": "messaging"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Run a log analysis on the database deployment to check for warnings"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "database",
+              "namespace": "default"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "messages": [
+        {
+          "role": "user",
+          "content": "Could you examine the ingress-controller deployment's logs for any issues in the networking namespace?"
+        },
+        {
+          "role": "assistant",
+          "function_call": {
+            "name": "analyze_deployment_logs",
+            "arguments": {
+              "deployment_name": "ingress-controller",
+              "namespace": "networking"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
