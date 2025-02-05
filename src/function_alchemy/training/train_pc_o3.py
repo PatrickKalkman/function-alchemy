@@ -1,9 +1,10 @@
+# Main training script for Phi-4 using Unsloth
 import os
 import json
 from huggingface_hub import login
 import wandb
 from trl import SFTTrainer
-from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling
+from transformers import TrainingArguments, DataCollatorForLanguageModeling
 from peft import LoraConfig
 from datasets import Dataset
 from dotenv import load_dotenv
@@ -22,20 +23,18 @@ def setup_wandb():
         raise ValueError("Missing required environment variables")
     login(token=hf_token)
     wandb.login(key=wb_token)
-    return wandb.init(project="phi-2-2.7B-func", job_type="training", anonymous="allow")
+    return wandb.init(project="phi-4-14B-func", job_type="training", anonymous="allow")
 
 
 def load_model_and_tokenizer(model_name):
-    tokenizer = AutoTokenizer.from_pretrained(model_name)
-    tokenizer.pad_token = tokenizer.eos_token
-    tokenizer.padding_side = "right"
-
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,
         max_seq_length=2048,
-        dtype=None,
         load_in_4bit=True,
+        dtype=None,
     )
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
     return model, tokenizer
 
 
@@ -61,6 +60,7 @@ def prepare_datasets(data, tokenizer):
     train_dataset = splits["train"].map(
         lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["train"].column_names
     )
+
     eval_dataset = splits["test"].map(
         lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["test"].column_names
     )
@@ -73,12 +73,12 @@ def prepare_datasets(data, tokenizer):
 
 def get_training_args():
     return TrainingArguments(
-        run_name="phi-2-func",
-        per_device_train_batch_size=8,
-        per_device_eval_batch_size=8,
-        gradient_accumulation_steps=4,
+        run_name="phi-4-func",
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=8,
         max_steps=500,
-        learning_rate=5e-5,
+        learning_rate=3e-5,
         lr_scheduler_type="cosine",
         warmup_ratio=0.1,
         bf16=True,
@@ -95,14 +95,14 @@ def get_training_args():
 
 
 if __name__ == "__main__":
-    model_name = "microsoft/phi-2"
+    model_name = "microsoft/phi-4"
     model, tokenizer = load_model_and_tokenizer(model_name)
 
     function_calling_data = load_training_data()
     train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
 
     lora_config = LoraConfig(
-        r=16,
+        r=8,
         lora_alpha=32,
         target_modules=[
             "q_proj",
@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     trainer.train()
 
-    new_model_name = "phi-2-2.7B-func"
+    new_model_name = "phi-4-14B-func"
     model.save_pretrained(new_model_name)
     tokenizer.save_pretrained(new_model_name)
 
