@@ -16,16 +16,19 @@ K8S_FUNCTIONS = [
         "description": "What's been happening in the cluster lately?",
         "parameters": {"type": "object", "properties": {}, "required": []},
     },
+    {
+        "name": "get_version_info",
+        "description": "Returns version information for both Kubernetes API server and nodes.",
+        "parameters": {"type": "object", "properties": {}, "required": []},
+    },
 ]
 
-PROMPT_TEMPLATE = """Below is an instruction that describes a task, paired with an API that contains functions. Write a JSON only response that appropriately calls a function. But only output JSON only.
+PROMPT_TEMPLATE = """You are an AI that ONLY returns the selected function call in JSON format. No explanations, no reasoning, only JSON.
 
 Available Functions:
 {functions}
 
-Instruction: {instruction}
-
-Response: {output}"""
+Instruction: {instruction}"""
 
 
 def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
@@ -60,29 +63,25 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
 def format_prompt(instruction: str, available_functions: List[Dict[str, Any]]) -> str:
     """Format the prompt with OpenAI-style function definitions."""
     functions_str = json.dumps(available_functions, indent=2)
-    return PROMPT_TEMPLATE.format(
-        functions=functions_str,
-        instruction=instruction,
-        thought="",  # Empty for inference
-        output="",  # Empty for inference
-    )
+    return PROMPT_TEMPLATE.format(functions=functions_str, instruction=instruction)
 
 
 def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
     """Generate a response from the model with streaming output."""
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-    
+
+    # print("\nPrompt:")
+    # print(prompt)
     # Store the generated text
     generated_text = ""
     print("\nGenerating response:")
     print("-" * 40)
-    
+
     # Stream the output token by token
     for output in model.generate(
         **inputs,
         max_new_tokens=max_new_tokens,
-        temperature=0.1,
-        do_sample=True,
+        do_sample=False,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
         streamer=None,  # We'll handle streaming manually
@@ -90,12 +89,12 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
         output_scores=True,
     ).sequences:
         current_text = tokenizer.decode(output, skip_special_tokens=True)
-        new_text = current_text[len(generated_text):]
+        new_text = current_text[len(generated_text) :]
         print(new_text, end="", flush=True)
         generated_text = current_text
-    
+
     print("\n" + "-" * 40)
-    
+
     # Return only the generated response without the prompt
     return generated_text.replace(prompt, "").strip()
 
@@ -103,6 +102,7 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
 def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
     """Extract and parse the function call from the model's response."""
     try:
+        response = response.replace("Output: ", "").strip()
         # Parse the JSON
         parsed = json.loads(response)
 
@@ -143,10 +143,18 @@ def run_test_cases():
             },
         },
         {
-            "instruction": "Show me the recent cluster events",
-            "expected_function": "get_last_events",
+            "instruction": "Are my nodes all on the same version?",
+            "expected_function": "get_version_info",
             "schema": {
-                "name": "get_last_events",
+                "name": "get_version_info",
+                "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
+        {
+            "instruction": "Check cluster version",
+            "expected_function": "get_version_info",
+            "schema": {
+                "name": "get_version_info",
                 "parameters": {"type": "object", "properties": {}, "required": []},
             },
         },
