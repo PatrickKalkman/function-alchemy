@@ -12,8 +12,11 @@ from transformers import TrainingArguments, AutoModelForCausalLM, AutoTokenizer,
 from peft import LoraConfig, get_peft_model
 from datasets import Dataset
 from dotenv import load_dotenv
-
+import huggingface_hub
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
+
+huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60  # Increase timeout to 60 seconds
+
 
 load_dotenv()
 
@@ -29,12 +32,16 @@ def setup_wandb():
     login(token=hf_token)
     wandb.login(key=wb_token)
 
-    return wandb.init(project="DeepSeek-R1-Distill-Qwen-1.5B-func", job_type="training", anonymous="allow")
+    return wandb.init(project="phi-2-2.7B-func", job_type="training", anonymous="allow")
 
 
 def load_model_and_tokenizer(model_name):
     """Load the base model and tokenizer."""
     tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+    # Set padding token (Phi-2 doesn't have one by default)
+    tokenizer.pad_token = tokenizer.eos_token  # Use EOS token for padding
+
     tokenizer.padding_side = "right"
 
     # Add device map for Mac M3
@@ -92,7 +99,7 @@ def prepare_datasets(data, tokenizer):
 
 def get_training_args():
     return TrainingArguments(
-        run_name="DeepSeek-R1-Distill-Qwen-1.5B-func-openai",
+        run_name="phi-2-func",
         per_device_train_batch_size=1,  # Reduced for M3
         per_device_eval_batch_size=1,  # Reduced for M3
         gradient_accumulation_steps=16,  # Increased to compensate
@@ -122,7 +129,7 @@ def prepare_model_for_training(model):
 
 if __name__ == "__main__":
     # Load model and tokenizer
-    model_name = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"
+    model_name = "microsoft/phi-2"
     model, tokenizer = load_model_and_tokenizer(model_name)
     model = prepare_model_for_training(model)
 
@@ -168,7 +175,7 @@ if __name__ == "__main__":
     trainer.train()
 
     # Save the model
-    new_model_name = "DeepSeek-R1-Distill-Qwen-1.5B-func-openai"
+    new_model_name = "phi-2-2.7B-func"
     model.save_pretrained(new_model_name)
     tokenizer.save_pretrained(new_model_name)
 
