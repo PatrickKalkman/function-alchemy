@@ -41,20 +41,13 @@ def load_model(model_repo: str, base_model_name: str = "deepseek-ai/DeepSeek-R1-
         # Try loading base model locally first
         print(f"Attempting to load base model locally from {base_model_name}")
         model = AutoModelForCausalLM.from_pretrained(
-            base_model_name,
-            torch_dtype=torch.bfloat16,
-            device_map="auto",
-            local_files_only=True
+            base_model_name, torch_dtype=torch.bfloat16, device_map="auto", local_files_only=True
         )
         tokenizer = AutoTokenizer.from_pretrained(base_model_name, local_files_only=True)
     except Exception as e:
         print(f"Local load failed: {e}")
         print(f"Loading base model from HuggingFace Hub: {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(
-            base_model_name,
-            torch_dtype=torch.bfloat16,
-            device_map="auto"
-        )
+        model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
     try:
@@ -105,22 +98,11 @@ def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
         parsed = json.loads(response)
 
         # Transform the format if needed
-        if "function" in parsed:
+        if "name" in parsed:
             # Convert from model's format to OpenAI format
-            function_data = parsed["function"]
-            transformed = {"function_call": {"name": function_data["name"], "arguments": {}}}
-
-            # Extract parameters if they exist
-            if "parameters" in function_data:
-                params = function_data["parameters"]
-                if isinstance(params, dict):
-                    # For deployment logs case
-                    if "deployment_name" in params:
-                        transformed["function_call"]["arguments"] = {
-                            "deployment_name": "frontend",
-                            "namespace": params.get("namespace", {}).get("default", "testing"),
-                        }
-
+            function_name = parsed["name"]
+            arguments = parsed.get("arguments", {})
+            transformed = {"function_call": {"name": function_name, "arguments": arguments}}
             return transformed
 
         return parsed
@@ -175,10 +157,8 @@ def run_test_cases():
         # Get the actual function name
         actual_name = None
         if function_call:
-            if "function" in function_call:
-                actual_name = function_call["function"]["name"]
-            elif "function_call" in function_call:
-                actual_name = function_call["function_call"]["name"]
+            if "name" in function_call:
+                actual_name = function_call["name"]
 
         results.append(
             {
