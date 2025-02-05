@@ -12,7 +12,6 @@ import huggingface_hub
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
-
 load_dotenv()
 
 
@@ -46,11 +45,9 @@ def load_model_and_tokenizer(model_name):
 def format_function_calling_data(examples, tokenizer):
     texts = []
     for input, output, funcs in zip(examples["instruction"], examples["output"], examples["functions"]):
-        # Strict JSON validation
         try:
             output_str = json.dumps(output, indent=2)
             functions_str = json.dumps(funcs, indent=2)
-
             text = (
                 PROMPT_TEMPLATE.format(functions=functions_str, instruction=input, output=output_str)
                 + tokenizer.eos_token
@@ -75,7 +72,6 @@ def prepare_datasets(data, tokenizer):
 
     print(f"\nTraining examples: {len(train_dataset)}")
     print(f"Evaluation examples: {len(eval_dataset)}")
-
     return train_dataset, eval_dataset
 
 
@@ -85,12 +81,13 @@ def get_training_args():
         per_device_train_batch_size=1,
         per_device_eval_batch_size=1,
         gradient_accumulation_steps=16,
-        max_steps=100,
+        max_steps=500,  # Increased from 100
         learning_rate=5e-5,
         weight_decay=0.05,
         lr_scheduler_type="cosine",
         warmup_ratio=0.1,
         fp16=False,
+        max_grad_norm=1.0,  # Added gradient clipping
         logging_steps=10,
         evaluation_strategy="steps",
         eval_steps=10,
