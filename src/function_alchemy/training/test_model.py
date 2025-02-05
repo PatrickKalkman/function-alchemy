@@ -36,16 +36,37 @@ Response: {output}"""
 
 
 def load_model(model_repo: str, base_model_name: str = "deepseek-ai/DeepSeek-R1-Distill-Qwen-1.5B"):
-    """Load the fine-tuned model and tokenizer from HuggingFace Hub."""
-    print(f"Loading base model from {base_model_name}")
-    print(f"Loading PEFT adapter from {model_repo}")
+    """Load the fine-tuned model and tokenizer, first trying locally then from HuggingFace Hub."""
+    try:
+        # Try loading base model locally first
+        print(f"Attempting to load base model locally from {base_model_name}")
+        model = AutoModelForCausalLM.from_pretrained(
+            base_model_name,
+            torch_dtype=torch.bfloat16,
+            device_map="auto",
+            local_files_only=True
+        )
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name, local_files_only=True)
+    except Exception as e:
+        print(f"Local load failed: {e}")
+        print(f"Loading base model from HuggingFace Hub: {base_model_name}")
+        model = AutoModelForCausalLM.from_pretrained(
+            base_model_name,
+            torch_dtype=torch.bfloat16,
+            device_map="auto"
+        )
+        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
 
-    model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
-    tokenizer = AutoTokenizer.from_pretrained(base_model_name)
+    try:
+        # Try loading PEFT adapter locally
+        print(f"Attempting to load PEFT adapter locally from {model_repo}")
+        model = PeftModel.from_pretrained(model, model_repo, device_map="auto", local_files_only=True)
+    except Exception as e:
+        print(f"Local PEFT load failed: {e}")
+        print(f"Loading PEFT adapter from HuggingFace Hub: {model_repo}")
+        model = PeftModel.from_pretrained(model, model_repo, device_map="auto")
 
-    model = PeftModel.from_pretrained(model, model_repo, device_map="auto")
     model.eval()
-
     return model, tokenizer
 
 
