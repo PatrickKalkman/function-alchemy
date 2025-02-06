@@ -112,7 +112,7 @@ def get_training_args():
         per_device_train_batch_size=4,
         per_device_eval_batch_size=4,
         gradient_accumulation_steps=8,
-        max_steps=500,
+        max_steps=200,
         learning_rate=2e-5,
         weight_decay=0.1,
         max_grad_norm=1.0,
