@@ -1,215 +1,147 @@
+import os
 import torch
 import json
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
-from typing import List, Dict, Any, Optional
+from huggingface_hub import login
+import wandb
+from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling
+from datasets import Dataset
+from dotenv import load_dotenv
+import huggingface_hub
+from unsloth import FastLanguageModel
+from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
-# Example OpenAI-style function definitions
-K8S_FUNCTIONS = [
-    {
-        "name": "get_number_of_nodes",
-        "description": "Get the number of nodes in the Kubernetes cluster",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-    },
-    {
-        "name": "get_last_events",
-        "description": "What's been happening in the cluster lately?",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-    },
-    {
-        "name": "get_version_info",
-        "description": "Returns version information for both Kubernetes API server and nodes.",
-        "parameters": {"type": "object", "properties": {}, "required": []},
-    },
-]
-
-PROMPT_TEMPLATE = """Return exactly one function call in JSON format with name and parameters fields. Example:
-{{"name": "function_name", "parameters": {{"type": "object", "properties": {{}}, "required": []}}}}
-
-Available Functions to choose from:
-{functions}
-
-Function: {instruction}"""
+huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
+load_dotenv()
 
 
-def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
-    """Load the fine-tuned model and tokenizer, first trying locally then from HuggingFace Hub."""
-    try:
-        # Try loading base model from HuggingFace Hub first
-        print(f"Loading base model from HuggingFace Hub: {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name)
-        tokenizer.pad_token = tokenizer.eos_token
-    except Exception as e:
-        print(f"HuggingFace Hub load failed: {e}")
-        print(f"Attempting to load base model locally from {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(
-            base_model_name, torch_dtype=torch.bfloat16, device_map="auto", local_files_only=True
-        )
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name, local_files_only=True)
+def setup_wandb():
+    hf_token = os.environ.get("HUGGINGFACE_TOKEN")
+    wb_token = os.environ.get("WANDB_API_KEY")
+    if not hf_token or not wb_token:
+        raise ValueError("Missing required environment variables")
+    login(token=hf_token)
+    wandb.login(key=wb_token)
+    return wandb.init(project="phi-4-func", job_type="training", anonymous="allow")
 
-    try:
-        # Try loading PEFT adapter from HuggingFace Hub
-        print(f"Loading PEFT adapter from HuggingFace Hub: {model_repo}")
-        model = PeftModel.from_pretrained(model, model_repo, device_map="auto")
-    except Exception as e:
-        print(f"HuggingFace Hub PEFT load failed: {e}")
-        print(f"Attempting to load PEFT adapter locally from {model_repo}")
-        model = PeftModel.from_pretrained(model, model_repo, device_map="auto", local_files_only=True)
 
-    model.eval()
+def load_model_and_tokenizer(model_name):
+    # Load tokenizer
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "right"
+
+    # Load model with unsloth optimizations
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        max_seq_length=256,
+        dtype="float16",
+        load_in_4bit=True,  # Quantization for memory efficiency
+        cache_dir="./cache",
+    )
+
     return model, tokenizer
 
 
-def format_prompt(instruction: str, available_functions: List[Dict[str, Any]]) -> str:
-    """Format the prompt with OpenAI-style function definitions."""
-    functions_str = json.dumps(available_functions, indent=2)
-    return PROMPT_TEMPLATE.format(functions=functions_str, instruction=instruction)
+def format_function_calling_data(examples, tokenizer):
+    texts = []
+    for input, output, funcs in zip(examples["instruction"], examples["output"], examples["functions"]):
+        try:
+            output_str = json.dumps(output, indent=2)
+            functions_str = json.dumps(funcs, indent=2)
+            text = (
+                PROMPT_TEMPLATE.format(functions=functions_str, instruction=input, output=output_str)
+                + tokenizer.eos_token
+            )
+            texts.append(text)
+        except (TypeError, json.JSONDecodeError):
+            continue
+    return {"text": texts}
 
 
-def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
-    """Generate a response from the model with streaming output."""
-    inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
+def prepare_datasets(data, tokenizer):
+    dataset = Dataset.from_list(data)
+    splits = dataset.train_test_split(test_size=0.2, shuffle=True, seed=3407)
 
-    # print("\nPrompt:")
-    # print(prompt)
-    # Store the generated text
-    generated_text = ""
-    print("\nGenerating response:")
-    print("-" * 40)
-
-    generation_output = model.generate(
-        **inputs,
-        max_new_tokens=128,
-        do_sample=True,
-        temperature=0.1,
-        top_p=0.9,
-        num_return_sequences=1,
-        pad_token_id=tokenizer.pad_token_id,
-        eos_token_id=tokenizer.eos_token_id,
-        return_dict_in_generate=True,  # Add this line
+    train_dataset = splits["train"].map(
+        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["train"].column_names
     )
 
-    for output in generation_output.sequences:
-        current_text = tokenizer.decode(output, skip_special_tokens=True)
-        new_text = current_text[len(generated_text) :]
-        print(new_text, end="", flush=True)
-        generated_text = current_text
+    eval_dataset = splits["test"].map(
+        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["test"].column_names
+    )
 
-    print("\n" + "-" * 40)
-
-    # Return only the generated response without the prompt
-    return generated_text.replace(prompt, "").strip()
+    print(f"\nTraining examples: {len(train_dataset)}")
+    print(f"Evaluation examples: {len(eval_dataset)}")
+    return train_dataset, eval_dataset
 
 
-def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
-    """Extract and parse the function call from the model's response."""
-    try:
-        response = response.replace("Output: ", "").strip()
-        # Parse the JSON
-        parsed = json.loads(response)
-
-        # Transform the format if needed
-        if "name" in parsed:
-            # Convert from model's format to OpenAI format
-            function_name = parsed["name"]
-            arguments = parsed.get("arguments", {})
-            transformed = {"function_call": {"name": function_name, "arguments": arguments}}
-            return transformed
-
-        return parsed
-    except json.JSONDecodeError:
-        print(f"Failed to parse JSON: {response}")
-        return None
-
-
-def run_test_cases():
-    """Run test cases with flexible function calling format validation."""
-    model_path = "pkalkman/phi-2-2.7B-func"
-    model, tokenizer = load_model(model_path)
-
-    test_cases = [
-        {
-            "instruction": "How many nodes are in the cluster?",
-            "expected_function": "get_number_of_nodes",
-            "schema": {
-                "name": "get_number_of_nodes",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-        },
-        {
-            "instruction": "What's been happening in the cluster lately?",
-            "expected_function": "get_last_events",
-            "schema": {
-                "name": "get_last_events",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-        },
-        {
-            "instruction": "Are my nodes all on the same version?",
-            "expected_function": "get_version_info",
-            "schema": {
-                "name": "get_version_info",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-        },
-        {
-            "instruction": "Check cluster version",
-            "expected_function": "get_version_info",
-            "schema": {
-                "name": "get_version_info",
-                "parameters": {"type": "object", "properties": {}, "required": []},
-            },
-        },
-    ]
-
-    results = []
-    for test_case in test_cases:
-        print(f"\nTesting: {test_case['instruction']}")
-
-        # Format prompt with all available functions
-        prompt = format_prompt(test_case["instruction"], K8S_FUNCTIONS)
-
-        # Generate response
-        response = generate_response(model, tokenizer, prompt)
-        print(f"Raw response:\n{response}")
-
-        # Parse function call
-        function_call = parse_function_call(response)
-        print(f"Parsed function call:\n{json.dumps(function_call, indent=2) if function_call else None}")
-
-        # Get the actual function name from the parsed response
-        actual_name = None
-        if function_call and "function_call" in function_call:
-            actual_name = function_call["function_call"].get("name")
-        elif function_call and "name" in function_call:
-            actual_name = function_call["name"]
-
-        # Validate function name
-        success = actual_name == test_case["expected_function"]
-
-        results.append(
-            {
-                "instruction": test_case["instruction"],
-                "expected_function": test_case["expected_function"],
-                "actual_function": actual_name,
-                "success": success,
-                "error": None if success else f"Expected {test_case['expected_function']}, got {actual_name}",
-            }
-        )
-
-        # Print individual test result
-        status = "✓" if success else "✗"
-        print(f"{status} Function name match: {success}")
-
-    # Print summary
-    print("\nTest Summary:")
-    passed = sum(1 for r in results if r["success"])
-    total = len(results)
-    print(f"Passed: {passed}/{total} ({passed / total * 100:.1f}%)")
-
-    return results
+def get_training_args():
+    return TrainingArguments(
+        run_name="phi-4-func",
+        per_device_train_batch_size=4,  # Increased due to better memory handling
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=8,  # Reduced due to increased batch size
+        max_steps=500,
+        learning_rate=2e-5,  # Adjusted for Phi-4
+        weight_decay=0.1,
+        max_grad_norm=1.0,
+        lr_scheduler_type="cosine",
+        warmup_ratio=0.2,
+        fp16=True,  # Enable mixed precision training
+        logging_steps=10,
+        evaluation_strategy="steps",
+        eval_steps=10,
+        save_strategy="steps",
+        save_steps=50,
+        output_dir="outputs",
+        save_total_limit=2,
+        push_to_hub=False,
+        report_to=["wandb"],
+        # Add gradient checkpointing for memory efficiency
+        gradient_checkpointing=True,
+    )
 
 
 if __name__ == "__main__":
-    results = run_test_cases()
+    model_name = "microsoft/phi-4"
+    model, tokenizer = load_model_and_tokenizer(model_name)
+
+    function_calling_data = load_training_data()
+    train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
+
+    # Initialize wandb
+    run = setup_wandb()
+
+    # Get training arguments
+    training_args = get_training_args()
+
+    # Configure training with unsloth
+    trainer = FastLanguageModel.get_peft_trainer(
+        model=model,
+        train_dataset=train_dataset,
+        eval_dataset=eval_dataset,
+        data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
+        args=training_args,
+        peft_config={
+            "r": 8,
+            "lora_alpha": 16,
+            "lora_dropout": 0.05,
+            "bias": "none",
+            "task_type": "CAUSAL_LM",
+        },
+    )
+
+    # Start training
+    trainer.train()
+
+    # Save the model
+    new_model_name = "phi-4-func"
+    trainer.save_model(new_model_name)
+    tokenizer.save_pretrained(new_model_name)
+
+    if os.environ.get("PUSH_TO_HUB", "true").lower() == "true":
+        model.push_to_hub(f"pkalkman/{new_model_name}")
+        tokenizer.push_to_hub(f"pkalkman/{new_model_name}")
+
+    wandb.finish()
+    print("\nTraining completed successfully!")
