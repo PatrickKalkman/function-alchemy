@@ -3,12 +3,12 @@ import torch
 import json
 from huggingface_hub import login
 import wandb
-from trl import SFTTrainer
-from transformers import TrainingArguments, AutoModelForCausalLM, AutoTokenizer, DataCollatorForLanguageModeling
-from peft import LoraConfig, get_peft_model
+from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling
 from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
+from unsloth import FastLanguageModel
+from unsloth.models import ModelConfig
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
@@ -22,23 +22,28 @@ def setup_wandb():
         raise ValueError("Missing required environment variables")
     login(token=hf_token)
     wandb.login(key=wb_token)
-    return wandb.init(project="phi-2-2.7B-func", job_type="training", anonymous="allow")
+    return wandb.init(project="phi-4-func", job_type="training", anonymous="allow")
 
 
 def load_model_and_tokenizer(model_name):
+    # Load tokenizer
     tokenizer = AutoTokenizer.from_pretrained(model_name)
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
-    model = AutoModelForCausalLM.from_pretrained(
-        model_name,
-        torch_dtype=torch.float16,
-        device_map="auto",
-        use_cache=False,
+    # Load model with unsloth optimizations
+    model_config = ModelConfig(
         max_length=256,
-        do_sample=False,
-        temperature=0.1,
+        dtype="float16",
+        load_in_4bit=True,  # Quantization for memory efficiency
     )
+
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        model_config=model_config,
+        cache_dir="./cache",
+    )
+
     return model, tokenizer
 
 
@@ -77,17 +82,17 @@ def prepare_datasets(data, tokenizer):
 
 def get_training_args():
     return TrainingArguments(
-        run_name="phi-2-func",
-        per_device_train_batch_size=1,
-        per_device_eval_batch_size=1,
-        gradient_accumulation_steps=16,
+        run_name="phi-4-func",
+        per_device_train_batch_size=4,  # Increased due to better memory handling
+        per_device_eval_batch_size=4,
+        gradient_accumulation_steps=8,  # Reduced due to increased batch size
         max_steps=500,
-        learning_rate=5e-6,  # Lower learning rate
-        weight_decay=0.1,  # Increase weight decay
-        max_grad_norm=1.0,  # Increase gradient clipping
+        learning_rate=2e-5,  # Adjusted for Phi-4
+        weight_decay=0.1,
+        max_grad_norm=1.0,
         lr_scheduler_type="cosine",
-        warmup_ratio=0.2,  # Longer warmup
-        fp16=True,
+        warmup_ratio=0.2,
+        fp16=True,  # Enable mixed precision training
         logging_steps=10,
         evaluation_strategy="steps",
         eval_steps=10,
@@ -97,57 +102,40 @@ def get_training_args():
         save_total_limit=2,
         push_to_hub=False,
         report_to=["wandb"],
+        # Add gradient checkpointing for memory efficiency
+        gradient_checkpointing=True,
     )
 
 
-def prepare_model_for_training(model):
-    model.config.use_cache = False
-    if hasattr(model, "enable_input_require_grads"):
-        model.enable_input_require_grads()
-    return model
-
-
 if __name__ == "__main__":
-    model_name = "microsoft/phi-2"
+    model_name = "microsoft/phi-4"
     model, tokenizer = load_model_and_tokenizer(model_name)
-    model = prepare_model_for_training(model)
 
     function_calling_data = load_training_data()
     train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
 
-    lora_config = LoraConfig(
-        r=8,
-        lora_alpha=16,
-        target_modules=[
-            "q_proj",
-            "k_proj",
-            "v_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
-        lora_dropout=0.05,
-        bias="none",
-        task_type="CAUSAL_LM",
-    )
-
-    model = get_peft_model(model, lora_config)
+    # Initialize wandb
     run = setup_wandb()
 
-    trainer = SFTTrainer(
+    # Get training arguments
+    training_args = get_training_args()
+
+    # Configure training with unsloth
+    trainer = FastLanguageModel.get_trainer(
         model=model,
-        processing_class=tokenizer,
+        tokenizer=tokenizer,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
-        args=get_training_args(),
+        args=training_args,
     )
 
+    # Start training
     trainer.train()
 
-    new_model_name = "phi-2-2.7B-func"
-    model.save_pretrained(new_model_name)
+    # Save the model
+    new_model_name = "phi-4-func"
+    trainer.save_model(new_model_name)
     tokenizer.save_pretrained(new_model_name)
 
     if os.environ.get("PUSH_TO_HUB", "true").lower() == "true":

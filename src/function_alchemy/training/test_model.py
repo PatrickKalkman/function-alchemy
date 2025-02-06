@@ -23,12 +23,13 @@ K8S_FUNCTIONS = [
     },
 ]
 
-PROMPT_TEMPLATE = """You are an AI that ONLY returns the selected single function call in JSON format. No explanations, no reasoning, only JSON.
+PROMPT_TEMPLATE = """Return exactly one function call in JSON format with name and parameters fields. Example:
+{{"name": "function_name", "parameters": {{"type": "object", "properties": {{}}, "required": []}}}}
 
-Available Functions:
+Available Functions to choose from:
 {functions}
 
-Instruction: {instruction}"""
+Function: {instruction}"""
 
 
 def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
@@ -77,17 +78,19 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
     print("\nGenerating response:")
     print("-" * 40)
 
-    # Stream the output token by token
-    for output in model.generate(
+    generation_output = model.generate(
         **inputs,
-        max_new_tokens=max_new_tokens,
-        do_sample=False,
+        max_new_tokens=128,
+        do_sample=True,
+        temperature=0.1,
+        top_p=0.9,
+        num_return_sequences=1,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        streamer=None,  # We'll handle streaming manually
-        return_dict_in_generate=True,
-        output_scores=True,
-    ).sequences:
+        return_dict_in_generate=True,  # Add this line
+    )
+
+    for output in generation_output.sequences:
         current_text = tokenizer.decode(output, skip_special_tokens=True)
         new_text = current_text[len(generated_text) :]
         print(new_text, end="", flush=True)
