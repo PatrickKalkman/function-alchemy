@@ -64,19 +64,36 @@ def format_function_calling_data(examples, tokenizer):
             texts.append(text)
         except (TypeError, json.JSONDecodeError):
             continue
-    return {"text": texts}
+
+    # Tokenize the texts
+    encodings = tokenizer(
+        texts,
+        truncation=True,
+        padding=False,
+        max_length=256,
+        return_tensors=None,
+    )
+
+    return encodings
 
 
 def prepare_datasets(data, tokenizer):
     dataset = Dataset.from_list(data)
     splits = dataset.train_test_split(test_size=0.2, shuffle=True, seed=3407)
 
+    # Add tokenization
     train_dataset = splits["train"].map(
-        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["train"].column_names
+        lambda x: format_function_calling_data(x, tokenizer),
+        batched=True,
+        remove_columns=splits["train"].column_names,
+        desc="Tokenizing training dataset",
     )
 
     eval_dataset = splits["test"].map(
-        lambda x: format_function_calling_data(x, tokenizer), batched=True, remove_columns=splits["test"].column_names
+        lambda x: format_function_calling_data(x, tokenizer),
+        batched=True,
+        remove_columns=splits["test"].column_names,
+        desc="Tokenizing validation dataset",
     )
 
     print(f"\nTraining examples: {len(train_dataset)}")
