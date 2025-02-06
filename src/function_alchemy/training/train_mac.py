@@ -1,4 +1,5 @@
 import os
+import torch
 import json
 from huggingface_hub import login
 import wandb
@@ -30,18 +31,6 @@ def load_model_and_tokenizer(model_name):
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
-    # Load model with unsloth optimizations
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=model_name,
-        max_seq_length=256,
-        dtype="float16",
-        load_in_4bit=True,  # Quantization for memory efficiency
-        cache_dir="./cache",
-    )
-
-    # Prepare model for k-bit training
-    model = prepare_model_for_kbit_training(model)
-
     # Configure LoRA
     lora_config = LoraConfig(
         r=8,
@@ -60,8 +49,15 @@ def load_model_and_tokenizer(model_name):
         ],
     )
 
-    model = model.get_peft_model(lora_config)
-    model.print_trainable_parameters()
+    # Load model with unsloth optimizations and LoRA config
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        max_seq_length=256,
+        dtype="bfloat16",  # Changed from float16 as suggested by unsloth
+        load_in_4bit=True,
+        cache_dir="./cache",
+        peft_config=lora_config,  # Pass LoRA config directly to unsloth
+    )
 
     return model, tokenizer
 
