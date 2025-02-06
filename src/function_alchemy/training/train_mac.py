@@ -31,13 +31,23 @@ def load_model_and_tokenizer(model_name):
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
-    # Configure LoRA
-    lora_config = LoraConfig(
+    # First load base model with unsloth optimizations
+    model, tokenizer = FastLanguageModel.from_pretrained(
+        model_name=model_name,
+        max_seq_length=256,
+        dtype="bfloat16",
+        load_in_4bit=True,
+        cache_dir="./cache",
+    )
+
+    # Then apply LoRA config using unsloth's FastLora
+    from unsloth.fast_lora import FastLora
+
+    lora = FastLora(
+        model,
         r=8,
-        lora_alpha=16,
-        lora_dropout=0.05,
-        bias="none",
-        task_type="CAUSAL_LM",
+        alpha=16,
+        dropout=0.05,
         target_modules=[
             "q_proj",
             "k_proj",
@@ -48,16 +58,8 @@ def load_model_and_tokenizer(model_name):
             "down_proj",
         ],
     )
-
-    # Load model with unsloth optimizations and LoRA config
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=model_name,
-        max_seq_length=256,
-        dtype="bfloat16",  # Changed from float16 as suggested by unsloth
-        load_in_4bit=True,
-        cache_dir="./cache",
-        peft_config=lora_config,  # Pass LoRA config directly to unsloth
-    )
+    model = lora.merge_and_unload()
+    model.print_trainable_parameters()
 
     return model, tokenizer
 
