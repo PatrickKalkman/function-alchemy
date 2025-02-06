@@ -1,13 +1,13 @@
 import os
-import torch
 import json
 from huggingface_hub import login
 import wandb
-from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling
+from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling, Trainer
 from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
 from unsloth import FastLanguageModel
+from peft import LoraConfig, prepare_model_for_kbit_training
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
@@ -38,6 +38,30 @@ def load_model_and_tokenizer(model_name):
         load_in_4bit=True,  # Quantization for memory efficiency
         cache_dir="./cache",
     )
+
+    # Prepare model for k-bit training
+    model = prepare_model_for_kbit_training(model)
+
+    # Configure LoRA
+    lora_config = LoraConfig(
+        r=8,
+        lora_alpha=16,
+        lora_dropout=0.05,
+        bias="none",
+        task_type="CAUSAL_LM",
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
+    )
+
+    model = model.get_peft_model(lora_config)
+    model.print_trainable_parameters()
 
     return model, tokenizer
 
@@ -78,18 +102,18 @@ def prepare_datasets(data, tokenizer):
 def get_training_args():
     return TrainingArguments(
         run_name="phi-4-func",
-        per_device_train_batch_size=4,  # Increased due to better memory handling
+        per_device_train_batch_size=4,
         per_device_eval_batch_size=4,
-        gradient_accumulation_steps=8,  # Reduced due to increased batch size
+        gradient_accumulation_steps=8,
         max_steps=500,
-        learning_rate=2e-5,  # Adjusted for Phi-4
+        learning_rate=2e-5,
         weight_decay=0.1,
         max_grad_norm=1.0,
         lr_scheduler_type="cosine",
         warmup_ratio=0.2,
-        fp16=True,  # Enable mixed precision training
+        fp16=True,
         logging_steps=10,
-        evaluation_strategy="steps",
+        eval_strategy="steps",  # Updated from evaluation_strategy
         eval_steps=10,
         save_strategy="steps",
         save_steps=50,
@@ -97,7 +121,6 @@ def get_training_args():
         save_total_limit=2,
         push_to_hub=False,
         report_to=["wandb"],
-        # Add gradient checkpointing for memory efficiency
         gradient_checkpointing=True,
     )
 
@@ -115,20 +138,13 @@ if __name__ == "__main__":
     # Get training arguments
     training_args = get_training_args()
 
-    # Configure training with unsloth
-    trainer = FastLanguageModel.get_peft_trainer(
+    # Create trainer
+    trainer = Trainer(
         model=model,
+        args=training_args,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
-        args=training_args,
-        peft_config={
-            "r": 8,
-            "lora_alpha": 16,
-            "lora_dropout": 0.05,
-            "bias": "none",
-            "task_type": "CAUSAL_LM",
-        },
     )
 
     # Start training
