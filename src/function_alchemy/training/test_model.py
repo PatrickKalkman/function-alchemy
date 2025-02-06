@@ -51,7 +51,7 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
             cache_dir="./cache",
         )
 
-        # Load the trained LoRA weights
+        # Apply LoRA configuration
         model = FastLanguageModel.get_peft_model(
             model,
             r=8,
@@ -66,8 +66,10 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
                 "up_proj",
                 "down_proj",
             ],
-            peft_model_id=model_repo,
         )
+
+        # Load the trained weights
+        model.load_adapter(model_repo, adapter_name="default")
 
         model.eval()
         return model, tokenizer
