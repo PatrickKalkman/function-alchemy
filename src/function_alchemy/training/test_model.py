@@ -71,6 +71,12 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
         # Load the trained weights
         model.load_adapter(model_repo, adapter_name="default")
 
+        # Prepare model for inference
+        model = FastLanguageModel.for_inference(model)
+        model.eval()
+
+        return model, tokenizer
+
         model.eval()
         return model, tokenizer
 
