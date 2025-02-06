@@ -3,14 +3,12 @@ import json
 from ..utils.paths import get_data_path
 
 # In loader.py
-PROMPT_TEMPLATE = """Below is an instruction that describes a task, paired with an API that contains functions. Write a response that appropriately calls the function.
+PROMPT_TEMPLATE = """<|im_start|>system<|im_sep|>You are an AI assistant that helps users interact with Kubernetes clusters through function calls. When given an instruction, you should respond with an appropriate function call from the available functions.
 
 Available Functions:
-{functions}
-
-Instruction: {instruction}
-
-Response: {output}"""
+{functions}<|im_end|>
+<|im_start|>user<|im_sep|>{instruction}<|im_end|>
+<|im_start|>assistant<|im_sep|>{output}<|im_end|>"""
 
 
 def load_training_data():

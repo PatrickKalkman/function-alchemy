@@ -23,13 +23,12 @@ K8S_FUNCTIONS = [
     },
 ]
 
-PROMPT_TEMPLATE = """Return exactly one function call in JSON format with name and parameters fields. Example:
-{{"name": "function_name", "parameters": {{"type": "object", "properties": {{}}, "required": []}}}}
+PROMPT_TEMPLATE = """<|im_start|>system<|im_sep|>You are an AI assistant that helps users interact with Kubernetes clusters through function calls. When given an instruction, you should respond with an appropriate function call from the available functions.
 
-Available Functions to choose from:
-{functions}
-
-Function: {instruction}"""
+Available Functions:
+{functions}<|im_end|>
+<|im_start|>user<|im_sep|>{instruction}<|im_end|>
+<|im_start|>assistant<|im_sep|>"""
 
 
 def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
@@ -41,6 +40,9 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = "right"
+
+        special_tokens = {"additional_special_tokens": ["<|im_start|>", "<|im_sep|>", "<|im_end|>"]}
+        tokenizer.add_special_tokens(special_tokens)
 
         # Load the base model with unsloth optimizations
         model, tokenizer = FastLanguageModel.from_pretrained(

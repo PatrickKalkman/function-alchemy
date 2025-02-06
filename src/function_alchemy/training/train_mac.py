@@ -31,6 +31,10 @@ def load_model_and_tokenizer(model_name):
     tokenizer.pad_token = tokenizer.eos_token
     tokenizer.padding_side = "right"
 
+    # Add special tokens for phi-4
+    special_tokens = {"additional_special_tokens": ["<|im_start|>", "<|im_sep|>", "<|im_end|>"]}
+    tokenizer.add_special_tokens(special_tokens)
+
     # First load base model with unsloth optimizations
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,
@@ -57,6 +61,7 @@ def format_function_calling_data(examples, tokenizer):
         try:
             output_str = json.dumps(output, indent=2)
             functions_str = json.dumps(funcs, indent=2)
+            # Use the new prompt template with phi-4's special tokens
             text = (
                 PROMPT_TEMPLATE.format(functions=functions_str, instruction=input, output=output_str)
                 + tokenizer.eos_token
@@ -65,7 +70,7 @@ def format_function_calling_data(examples, tokenizer):
         except (TypeError, json.JSONDecodeError):
             continue
 
-    # Tokenize the texts
+    # Keep the original tokenization logic
     encodings = tokenizer(
         texts,
         truncation=True,
