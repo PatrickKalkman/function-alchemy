@@ -8,7 +8,6 @@ from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
 from unsloth import FastLanguageModel
-from unsloth.models import ModelConfig
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
@@ -32,15 +31,11 @@ def load_model_and_tokenizer(model_name):
     tokenizer.padding_side = "right"
 
     # Load model with unsloth optimizations
-    model_config = ModelConfig(
-        max_length=256,
-        dtype="float16",
-        load_in_4bit=True,  # Quantization for memory efficiency
-    )
-
     model, tokenizer = FastLanguageModel.from_pretrained(
         model_name=model_name,
-        model_config=model_config,
+        max_seq_length=256,
+        dtype="float16",
+        load_in_4bit=True,  # Quantization for memory efficiency
         cache_dir="./cache",
     )
 
@@ -121,13 +116,19 @@ if __name__ == "__main__":
     training_args = get_training_args()
 
     # Configure training with unsloth
-    trainer = FastLanguageModel.get_trainer(
+    trainer = FastLanguageModel.get_peft_trainer(
         model=model,
-        tokenizer=tokenizer,
         train_dataset=train_dataset,
         eval_dataset=eval_dataset,
         data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
         args=training_args,
+        peft_config={
+            "r": 8,
+            "lora_alpha": 16,
+            "lora_dropout": 0.05,
+            "bias": "none",
+            "task_type": "CAUSAL_LM",
+        },
     )
 
     # Start training
