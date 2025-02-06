@@ -40,26 +40,13 @@ def load_model_and_tokenizer(model_name):
         cache_dir="./cache",
     )
 
-    # Then apply LoRA config using unsloth's FastLora
-    from unsloth.fast_lora import FastLora
-
-    lora = FastLora(
+    model = FastLanguageModel.get_peft_model(
         model,
         r=8,
-        alpha=16,
-        dropout=0.05,
-        target_modules=[
-            "q_proj",
-            "k_proj",
-            "v_proj",
-            "o_proj",
-            "gate_proj",
-            "up_proj",
-            "down_proj",
-        ],
+        lora_alpha=16,
+        lora_dropout=0.05,
+        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
     )
-    model = lora.merge_and_unload()
-    model.print_trainable_parameters()
 
     return model, tokenizer
 
