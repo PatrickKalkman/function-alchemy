@@ -1,8 +1,8 @@
 import torch
 import json
-from transformers import AutoModelForCausalLM, AutoTokenizer
-from peft import PeftModel
+from transformers import AutoTokenizer
 from typing import List, Dict, Any, Optional
+from unsloth import FastLanguageModel
 
 # Example OpenAI-style function definitions
 K8S_FUNCTIONS = [
@@ -32,33 +32,49 @@ Available Functions to choose from:
 Function: {instruction}"""
 
 
-def load_model(model_repo: str, base_model_name: str = "microsoft/phi-2"):
-    """Load the fine-tuned model and tokenizer, first trying locally then from HuggingFace Hub."""
+def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
+    """Load the fine-tuned model and tokenizer using unsloth optimizations."""
     try:
-        # Try loading base model from HuggingFace Hub first
-        print(f"Loading base model from HuggingFace Hub: {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(base_model_name, torch_dtype=torch.bfloat16, device_map="auto")
+        print(f"Loading model and tokenizer using unsloth from: {model_repo}")
+
+        # Initialize tokenizer
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
         tokenizer.pad_token = tokenizer.eos_token
-    except Exception as e:
-        print(f"HuggingFace Hub load failed: {e}")
-        print(f"Attempting to load base model locally from {base_model_name}")
-        model = AutoModelForCausalLM.from_pretrained(
-            base_model_name, torch_dtype=torch.bfloat16, device_map="auto", local_files_only=True
+        tokenizer.padding_side = "right"
+
+        # Load the base model with unsloth optimizations
+        model, tokenizer = FastLanguageModel.from_pretrained(
+            model_name=base_model_name,
+            max_seq_length=256,
+            dtype="bfloat16",
+            load_in_4bit=True,
+            cache_dir="./cache",
         )
-        tokenizer = AutoTokenizer.from_pretrained(base_model_name, local_files_only=True)
 
-    try:
-        # Try loading PEFT adapter from HuggingFace Hub
-        print(f"Loading PEFT adapter from HuggingFace Hub: {model_repo}")
-        model = PeftModel.from_pretrained(model, model_repo, device_map="auto")
+        # Load the trained LoRA weights
+        model = FastLanguageModel.get_peft_model(
+            model,
+            r=8,
+            lora_alpha=16,
+            lora_dropout=0.05,
+            target_modules=[
+                "q_proj",
+                "k_proj",
+                "v_proj",
+                "o_proj",
+                "gate_proj",
+                "up_proj",
+                "down_proj",
+            ],
+            peft_model_id=model_repo,
+        )
+
+        model.eval()
+        return model, tokenizer
+
     except Exception as e:
-        print(f"HuggingFace Hub PEFT load failed: {e}")
-        print(f"Attempting to load PEFT adapter locally from {model_repo}")
-        model = PeftModel.from_pretrained(model, model_repo, device_map="auto", local_files_only=True)
-
-    model.eval()
-    return model, tokenizer
+        print(f"Failed to load model: {e}")
+        raise
 
 
 def format_prompt(instruction: str, available_functions: List[Dict[str, Any]]) -> str:
@@ -67,27 +83,24 @@ def format_prompt(instruction: str, available_functions: List[Dict[str, Any]]) -
     return PROMPT_TEMPLATE.format(functions=functions_str, instruction=instruction)
 
 
-def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
+def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 128):
     """Generate a response from the model with streaming output."""
     inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 
-    # print("\nPrompt:")
-    # print(prompt)
-    # Store the generated text
     generated_text = ""
     print("\nGenerating response:")
     print("-" * 40)
 
     generation_output = model.generate(
         **inputs,
-        max_new_tokens=128,
+        max_new_tokens=max_new_tokens,
         do_sample=True,
         temperature=0.1,
         top_p=0.9,
         num_return_sequences=1,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        return_dict_in_generate=True,  # Add this line
+        return_dict_in_generate=True,
     )
 
     for output in generation_output.sequences:
@@ -97,8 +110,6 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 512):
         generated_text = current_text
 
     print("\n" + "-" * 40)
-
-    # Return only the generated response without the prompt
     return generated_text.replace(prompt, "").strip()
 
 
@@ -106,12 +117,9 @@ def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
     """Extract and parse the function call from the model's response."""
     try:
         response = response.replace("Output: ", "").strip()
-        # Parse the JSON
         parsed = json.loads(response)
 
-        # Transform the format if needed
         if "name" in parsed:
-            # Convert from model's format to OpenAI format
             function_name = parsed["name"]
             arguments = parsed.get("arguments", {})
             transformed = {"function_call": {"name": function_name, "arguments": arguments}}
@@ -125,7 +133,7 @@ def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
 
 def run_test_cases():
     """Run test cases with flexible function calling format validation."""
-    model_path = "pkalkman/phi-2-2.7B-func"
+    model_path = "pkalkman/phi-4-func"  # Updated to your new model name
     model, tokenizer = load_model(model_path)
 
     test_cases = [
@@ -166,26 +174,19 @@ def run_test_cases():
     results = []
     for test_case in test_cases:
         print(f"\nTesting: {test_case['instruction']}")
-
-        # Format prompt with all available functions
         prompt = format_prompt(test_case["instruction"], K8S_FUNCTIONS)
-
-        # Generate response
         response = generate_response(model, tokenizer, prompt)
         print(f"Raw response:\n{response}")
 
-        # Parse function call
         function_call = parse_function_call(response)
         print(f"Parsed function call:\n{json.dumps(function_call, indent=2) if function_call else None}")
 
-        # Get the actual function name from the parsed response
         actual_name = None
         if function_call and "function_call" in function_call:
             actual_name = function_call["function_call"].get("name")
         elif function_call and "name" in function_call:
             actual_name = function_call["name"]
 
-        # Validate function name
         success = actual_name == test_case["expected_function"]
 
         results.append(
@@ -198,11 +199,9 @@ def run_test_cases():
             }
         )
 
-        # Print individual test result
         status = "✓" if success else "✗"
         print(f"{status} Function name match: {success}")
 
-    # Print summary
     print("\nTest Summary:")
     passed = sum(1 for r in results if r["success"])
     total = len(results)
