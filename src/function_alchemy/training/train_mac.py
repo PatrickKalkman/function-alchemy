@@ -10,6 +10,7 @@ from transformers import (
     AutoModelForCausalLM,
     DataCollatorForLanguageModeling,
     Trainer,
+    BitsAndBytesConfig,
 )
 from datasets import Dataset
 from dotenv import load_dotenv
@@ -42,8 +43,18 @@ def load_model_and_tokenizer(model_name):
     tokenizer.add_special_tokens(special_tokens)
 
     # Load the base model with 4-bit quantization
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4"
+    )
+
     model = AutoModelForCausalLM.from_pretrained(
-        model_name, torch_dtype=torch.bfloat16, load_in_4bit=True, device_map="auto"
+        model_name,
+        quantization_config=bnb_config,
+        torch_dtype=torch.bfloat16,
+        device_map="auto"
     )
 
     # Prepare model for k-bit training
@@ -126,7 +137,7 @@ def get_training_args():
         warmup_ratio=0.2,
         fp16=True,
         logging_steps=10,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         eval_steps=10,
         save_strategy="steps",
         save_steps=50,
