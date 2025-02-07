@@ -1,10 +1,10 @@
 import torch
 import json
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
+from peft import PeftModel
 from typing import List, Dict, Any, Optional
-from unsloth import FastLanguageModel
 
-# Example OpenAI-style function definitions
+# K8S_FUNCTIONS definition remains the same
 K8S_FUNCTIONS = [
     {
         "name": "get_number_of_nodes",
@@ -32,11 +32,10 @@ Available Functions:
 
 
 def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
-    """Load the fine-tuned model and tokenizer using unsloth optimizations."""
+    """Load the fine-tuned model and tokenizer."""
     try:
-        print(f"Loading model and tokenizer using unsloth from: {model_repo}")
+        print(f"Loading model and tokenizer from: {model_repo}")
 
-        # Initialize tokenizer
         tokenizer = AutoTokenizer.from_pretrained(base_model_name)
         tokenizer.pad_token = tokenizer.eos_token
         tokenizer.padding_side = "right"
@@ -44,41 +43,11 @@ def load_model(model_repo: str, base_model_name: str = "microsoft/phi-4"):
         special_tokens = {"additional_special_tokens": ["<|im_start|>", "<|im_sep|>", "<|im_end|>"]}
         tokenizer.add_special_tokens(special_tokens)
 
-        # Load the base model with unsloth optimizations
-        model, tokenizer = FastLanguageModel.from_pretrained(
-            model_name=base_model_name,
-            max_seq_length=256,
-            dtype="bfloat16",
-            load_in_4bit=True,
-            cache_dir="./cache",
+        base_model = AutoModelForCausalLM.from_pretrained(
+            base_model_name, torch_dtype=torch.bfloat16, load_in_4bit=True, device_map="auto"
         )
 
-        # Apply LoRA configuration
-        model = FastLanguageModel.get_peft_model(
-            model,
-            r=8,
-            lora_alpha=16,
-            lora_dropout=0.05,
-            target_modules=[
-                "q_proj",
-                "k_proj",
-                "v_proj",
-                "o_proj",
-                "gate_proj",
-                "up_proj",
-                "down_proj",
-            ],
-        )
-
-        # Load the trained weights
-        model.load_adapter(model_repo, adapter_name="default")
-
-        # Prepare model for inference
-        model = FastLanguageModel.for_inference(model)
-        model.eval()
-
-        return model, tokenizer
-
+        model = PeftModel.from_pretrained(base_model, model_repo)
         model.eval()
         return model, tokenizer
 
@@ -110,21 +79,16 @@ def generate_response(model, tokenizer, prompt: str, max_new_tokens: int = 128):
         num_return_sequences=1,
         pad_token_id=tokenizer.pad_token_id,
         eos_token_id=tokenizer.eos_token_id,
-        return_dict_in_generate=True,
     )
 
-    for output in generation_output.sequences:
-        current_text = tokenizer.decode(output, skip_special_tokens=True)
-        new_text = current_text[len(generated_text) :]
-        print(new_text, end="", flush=True)
-        generated_text = current_text
-
-    print("\n" + "-" * 40)
+    generated_text = tokenizer.decode(generation_output[0], skip_special_tokens=True)
+    print(generated_text.replace(prompt, "").strip())
+    print("-" * 40)
     return generated_text.replace(prompt, "").strip()
 
 
+# parse_function_call and run_test_cases remain the same
 def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
-    """Extract and parse the function call from the model's response."""
     try:
         response = response.replace("Output: ", "").strip()
         parsed = json.loads(response)
@@ -142,8 +106,7 @@ def parse_function_call(response: str) -> Optional[Dict[str, Any]]:
 
 
 def run_test_cases():
-    """Run test cases with flexible function calling format validation."""
-    model_path = "pkalkman/phi-4-func"  # Updated to your new model name
+    model_path = "pkalkman/phi-4-func"
     model, tokenizer = load_model(model_path)
 
     test_cases = [
