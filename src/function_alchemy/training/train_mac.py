@@ -1,14 +1,18 @@
 import os
 import torch
 import json
-from huggingface_hub import login
 import wandb
-from transformers import TrainingArguments, AutoTokenizer, DataCollatorForLanguageModeling, Trainer
+from transformers import (
+    TrainingArguments,
+    AutoTokenizer,
+    AutoModelForCausalLM,
+    DataCollatorForLanguageModeling,
+    Trainer,
+)
 from datasets import Dataset
 from dotenv import load_dotenv
 import huggingface_hub
-from unsloth import FastLanguageModel
-from peft import LoraConfig, prepare_model_for_kbit_training
+from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from ..data.loader import load_training_data, PROMPT_TEMPLATE
 
 huggingface_hub.constants.HUGGINGFACE_HUB_DEFAULT_TIMEOUT = 60
@@ -35,22 +39,25 @@ def load_model_and_tokenizer(model_name):
     special_tokens = {"additional_special_tokens": ["<|im_start|>", "<|im_sep|>", "<|im_end|>"]}
     tokenizer.add_special_tokens(special_tokens)
 
-    # First load base model with unsloth optimizations
-    model, tokenizer = FastLanguageModel.from_pretrained(
-        model_name=model_name,
-        max_seq_length=256,
-        dtype="bfloat16",
-        load_in_4bit=True,
-        cache_dir="./cache",
+    # Load the base model with 4-bit quantization
+    model = AutoModelForCausalLM.from_pretrained(
+        model_name, torch_dtype=torch.bfloat16, load_in_4bit=True, device_map="auto"
     )
 
-    model = FastLanguageModel.get_peft_model(
-        model,
+    # Prepare model for k-bit training
+    model = prepare_model_for_kbit_training(model)
+
+    # Configure and apply LoRA
+    lora_config = LoraConfig(
         r=8,
         lora_alpha=16,
         lora_dropout=0.05,
         target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        bias="none",
+        task_type="CAUSAL_LM",
     )
+    model = get_peft_model(model, lora_config)
+    model.config.use_cache = False
 
     return model, tokenizer
 
@@ -61,7 +68,6 @@ def format_function_calling_data(examples, tokenizer):
         try:
             output_str = json.dumps(output, indent=2)
             functions_str = json.dumps(funcs, indent=2)
-            # Use the new prompt template with phi-4's special tokens
             text = (
                 PROMPT_TEMPLATE.format(functions=functions_str, instruction=input, output=output_str)
                 + tokenizer.eos_token
@@ -70,7 +76,6 @@ def format_function_calling_data(examples, tokenizer):
         except (TypeError, json.JSONDecodeError):
             continue
 
-    # Keep the original tokenization logic
     encodings = tokenizer(
         texts,
         truncation=True,
@@ -86,7 +91,6 @@ def prepare_datasets(data, tokenizer):
     dataset = Dataset.from_list(data)
     splits = dataset.train_test_split(test_size=0.2, shuffle=True, seed=3407)
 
-    # Add tokenization
     train_dataset = splits["train"].map(
         lambda x: format_function_calling_data(x, tokenizer),
         batched=True,
@@ -120,7 +124,7 @@ def get_training_args():
         warmup_ratio=0.2,
         fp16=True,
         logging_steps=10,
-        eval_strategy="steps",  # Updated from evaluation_strategy
+        evaluation_strategy="steps",
         eval_steps=10,
         save_strategy="steps",
         save_steps=50,
@@ -139,13 +143,9 @@ if __name__ == "__main__":
     function_calling_data = load_training_data()
     train_dataset, eval_dataset = prepare_datasets(function_calling_data, tokenizer)
 
-    # Initialize wandb
     run = setup_wandb()
-
-    # Get training arguments
     training_args = get_training_args()
 
-    # Create trainer
     trainer = Trainer(
         model=model,
         args=training_args,
@@ -154,10 +154,8 @@ if __name__ == "__main__":
         data_collator=DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False),
     )
 
-    # Start training
     trainer.train()
 
-    # Save the model
     new_model_name = "phi-4-func"
     trainer.save_model(new_model_name)
     tokenizer.save_pretrained(new_model_name)
